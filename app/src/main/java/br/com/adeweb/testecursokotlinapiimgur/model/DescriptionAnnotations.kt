@@ -1,0 +1,3 @@
+package br.com.adeweb.testecursokotlinapiimgur.model
+
+class DescriptionAnnotations
