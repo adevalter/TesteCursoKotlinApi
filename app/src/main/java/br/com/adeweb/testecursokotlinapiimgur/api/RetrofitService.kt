@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitService {
     const val BASE_URL = "https://api.imgur.com/3/"
-    const val CLIENT_ID = "Client-ID 1ceddedc03a5d71"
 
     private val okHttpClient: OkHttpClient = OkHttpClient.Builder()
         .writeTimeout(10, TimeUnit.SECONDS)

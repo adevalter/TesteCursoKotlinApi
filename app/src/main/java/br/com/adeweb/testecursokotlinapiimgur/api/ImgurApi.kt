@@ -8,7 +8,7 @@ import retrofit2.http.Query
 interface ImgurApi {
 
     @GET("/gallery/search/")
-    suspend fun recuperarCats(
-        @Query("q=cats") search: String
+    suspend fun consultarCats(
+        @Query("q") search: String
     ): Response<Cats>
 }
