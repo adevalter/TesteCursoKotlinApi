@@ -4,14 +4,15 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.recyclerview.widget.GridLayoutManager
+import br.com.adeweb.testecursokotlinapiimgur.adapter.ImgurAdapeter
 import br.com.adeweb.testecursokotlinapiimgur.api.ImgurApi
 import br.com.adeweb.testecursokotlinapiimgur.api.RetrofitService
 import br.com.adeweb.testecursokotlinapiimgur.databinding.ActivityMainBinding
 import br.com.adeweb.testecursokotlinapiimgur.model.Cats
-import br.com.adeweb.testecursokotlinapiimgur.model.Image
+import br.com.adeweb.testecursokotlinapiimgur.model.ListaImg
 import kotlinx.coroutines.*
 import retrofit2.Response
-import kotlin.math.log
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,12 +23,18 @@ class MainActivity : AppCompatActivity() {
     private val ImgurApi by lazy {
         RetrofitService.recuperarApi(ImgurApi::class.java)
     }
+    var gridLayoutManager: GridLayoutManager? = null
+
+    private lateinit var imgurAdapeter: ImgurAdapeter
 
     var jobImgurCats: Job? = null
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView( binding.root )
+        inicializarViews()
     }
 
     override fun onStart() {
@@ -40,6 +47,15 @@ class MainActivity : AppCompatActivity() {
         jobImgurCats?.cancel()
     }
 
+    private fun inicializarViews(){
+        imgurAdapeter = ImgurAdapeter()
+        binding.rvImages.adapter = imgurAdapeter
+        gridLayoutManager = GridLayoutManager(
+            this,
+            3
+        )
+        binding.rvImages.layoutManager = gridLayoutManager
+    }
 
 
     private fun consultarCats(){
@@ -56,23 +72,35 @@ class MainActivity : AppCompatActivity() {
 
             if (resposta!=null) {
                 if(resposta.isSuccessful){
+
+                    val lst = mutableListOf<ListaImg>()
                     val imgurResposta = resposta.body()
                     val listaImgur = imgurResposta?.data
                     if(listaImgur != null && listaImgur.isNotEmpty()){
                      //   Log.i("info_imgur_size", "consultarCats:   - ${listaImgur[0].images}. ")
-                        listaImgur.forEach{ data ->
 
+                        listaImgur.forEach{ data ->
                            val qtde = data.images_count
-                            if(qtde > 1){
+                            if(qtde >= 1){
                                 val linkSite = data.images.forEach{ img ->
                                    val tipo = img.type
-                                   val linksie = img.link
-                                    Log.i("info_imgur_img", "consultarCats: $tipo $linksie")
+                                    Log.i("info_imgur_lista", "consultarCats: $tipo ")
+                                    if(tipo == "image/jpeg") {
+                                        var listaNova = ListaImg(img.link)
+                                        lst.add(listaNova)
+                                    }
                                 }
+
                             }
 
-                                Log.i("info_imgur_img", "consultarCats: $qtde ")
+                        //    Log.i("info_imgur_img", "consultarCats: $qtde ")
 
+                        }
+                        Log.i("info_imgur_lista", "consultarCats: $lst")
+
+                        withContext(Dispatchers.Main){
+
+                       imgurAdapeter.adicionarLista( lst)
                         }
                     }
 
@@ -94,5 +122,9 @@ class MainActivity : AppCompatActivity() {
             Toast.LENGTH_LONG
         ).show()
     }
+
+}
+
+private fun <E> MutableList<E>.add(element: String) {
 
 }
