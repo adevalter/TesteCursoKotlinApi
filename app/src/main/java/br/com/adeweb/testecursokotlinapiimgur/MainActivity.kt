@@ -3,8 +3,11 @@ package br.com.adeweb.testecursokotlinapiimgur
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.AbsListView
+import android.widget.AbsListView.OnScrollListener
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import br.com.adeweb.testecursokotlinapiimgur.adapter.ImgurAdapeter
 import br.com.adeweb.testecursokotlinapiimgur.api.ImgurApi
 import br.com.adeweb.testecursokotlinapiimgur.api.RetrofitService
@@ -13,6 +16,7 @@ import br.com.adeweb.testecursokotlinapiimgur.model.Cats
 import br.com.adeweb.testecursokotlinapiimgur.model.ListaImg
 import kotlinx.coroutines.*
 import retrofit2.Response
+import kotlin.math.log
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,7 +33,7 @@ class MainActivity : AppCompatActivity() {
 
     var jobImgurCats: Job? = null
 
-
+    private var paginaAtual = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,8 +59,8 @@ class MainActivity : AppCompatActivity() {
             3
         )
         binding.rvImages.layoutManager = gridLayoutManager
-    }
 
+    }
 
     private fun consultarCats(){
         jobImgurCats =  CoroutineScope(Dispatchers.IO).launch{
